@@ -29,7 +29,13 @@ export class AuthService {
     user.email = signUpDto.email;
     user.password = hashedPassword;
 
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    const payload = { sub: savedUser.id, username: savedUser.email };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async login(loginDto: LoginDto) {
