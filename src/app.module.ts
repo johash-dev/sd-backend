@@ -6,6 +6,9 @@ import { RoomModule } from './modules/room/room.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 import { User } from './modules';
+import { HashingService } from './util/hashing.service';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './util/constants';
 
 @Module({
   imports: [
@@ -20,10 +23,15 @@ import { User } from './modules';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '7d' },
+    }),
     RoomModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, HashingService],
 })
 export class AppModule {}
