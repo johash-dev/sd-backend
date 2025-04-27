@@ -1,5 +1,12 @@
+import { Estimation } from 'src/modules/estimation/entities/estimation.entity';
 import { Room } from 'src/modules/room/entities/room.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+export enum UserStoryStatus {
+  PENDING = 'pending',
+  IN_ESTIMATION = 'in_estimation',
+  ESTIMATED = 'estimated',
+}
 
 @Entity()
 export class Story {
@@ -12,4 +19,10 @@ export class Story {
 
   @Column()
   title: string;
+
+  @OneToMany(() => Estimation, (estimation) => estimation.story)
+  estimations: Estimation[];
+
+  @Column({ type: 'enum', enum: UserStoryStatus, default: UserStoryStatus.PENDING })
+  status: UserStoryStatus;
 }

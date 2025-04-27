@@ -1,0 +1,14 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { EstimationService } from './estimation.service';
+import { CreateEstimationDto } from './dto/create-estimation.dto';
+import { UpdateEstimationDto } from './dto/update-estimation.dto';
+
+@Controller('estimation')
+export class EstimationController {
+  constructor(private readonly estimationService: EstimationService) {}
+
+  @Post()
+  create(@Body() createEstimationDto: CreateEstimationDto) {
+    return this.estimationService.create(createEstimationDto);
+  }
+}

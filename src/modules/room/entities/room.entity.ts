@@ -1,3 +1,4 @@
+import { Participant } from 'src/modules/participant/entities/participant.entity';
 import { Story } from 'src/modules/story/entities/story.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
@@ -28,4 +29,7 @@ export class Room {
 
   @OneToMany(() => Story, (story) => story.room)
   stories: Story[];
+
+  @OneToMany(() => Participant, (participant) => participant.room)
+  participants: Participant[];
 }

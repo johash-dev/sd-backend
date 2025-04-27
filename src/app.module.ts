@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomModule } from './modules/room/room.module';
 import { AuthModule } from './modules/auth/auth.module';
 
-import { User, Room, Story } from './modules';
+import { User, Room, Story, Participant, Estimation } from './modules';
 import { HashingService } from './util/hashing.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './util/constants';
@@ -13,6 +13,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/auth.guard';
 import { StoryModule } from './modules/story/story.module';
 import { UserModule } from './modules/user/user.module';
+import { EstimationModule } from './modules/estimation/estimation.module';
+import { ParticipantModule } from './modules/participant/participant.module';
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import { UserModule } from './modules/user/user.module';
       username: 'postgres',
       password: 'root',
       database: 'sd-db',
-      entities: [User, Room, Story],
+      entities: [User, Room, Story, Participant, Estimation],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -36,6 +38,8 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     StoryModule,
     UserModule,
+    EstimationModule,
+    ParticipantModule,
   ],
   controllers: [AppController],
   providers: [
