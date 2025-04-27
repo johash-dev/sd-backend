@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Room } from './entities/room.entity';
 import { Repository } from 'typeorm';
@@ -24,6 +24,10 @@ export class RoomService {
 
   async joinRoom(user: User, roomCode: string) {
     const room = await this.getRoom(roomCode);
+
+    if (room.owner.id === user.id) {
+      throw new HttpException('You are the room owner', HttpStatus.CONFLICT);
+    }
 
     const participant = new Participant();
     participant.room = room;

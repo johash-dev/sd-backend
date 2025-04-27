@@ -1,8 +1,9 @@
 import { Room } from 'src/modules/room/entities/room.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
+@Unique(['room', 'user']) //
 export class Participant {
   @PrimaryGeneratedColumn()
   id: number;
