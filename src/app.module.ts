@@ -5,10 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomModule } from './modules/room/room.module';
 import { AuthModule } from './modules/auth/auth.module';
 
-import { User } from './modules';
+import { User, Room } from './modules';
 import { HashingService } from './util/hashing.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './util/constants';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './common/guards/auth.guard';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { jwtConstants } from './util/constants';
       username: 'postgres',
       password: 'root',
       database: 'sd-db',
-      entities: [User],
+      entities: [User, Room],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -32,6 +34,13 @@ import { jwtConstants } from './util/constants';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, HashingService],
+  providers: [
+    AppService,
+    HashingService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}
