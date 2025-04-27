@@ -1,4 +1,14 @@
-import { Column, Entity, Generated, PrimaryGeneratedColumn } from 'typeorm';
+import { Story } from 'src/modules/story/entities/story.entity';
+import { User } from 'src/modules/user/entities/user.entity';
+import {
+  Column,
+  Entity,
+  Generated,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Room {
@@ -8,9 +18,13 @@ export class Room {
   @Generated('uuid')
   roomCode: string;
 
-  @Column()
-  ownerId: number;
+  @ManyToOne(() => User, (user) => user.rooms, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'ownerId' })
+  owner: User;
 
   @Column()
   title: string;
+
+  @OneToMany(() => Story, (story) => story.room)
+  stories: Story[];
 }
