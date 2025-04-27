@@ -1,23 +1,22 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignUpDto } from './dto/signup.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
 import { HashingService } from 'src/util/hashing.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/common/types';
+import { UserService } from '../user/user.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
     private hashingService: HashingService,
     private jwtService: JwtService,
+    private userService: UserService,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
-    const existingUser = await this.userRepository.findOne({ where: { email: signUpDto.email } });
+    const existingUser = await this.userService.findOneByEmail(signUpDto.email);
 
     if (existingUser) {
       throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
@@ -25,12 +24,12 @@ export class AuthService {
 
     const hashedPassword = await this.hashingService.getHashedString(signUpDto.password);
 
-    const user = new User();
-    user.firstName = signUpDto.firstName;
-    user.email = signUpDto.email;
-    user.password = hashedPassword;
+    const userDto = new CreateUserDto();
+    userDto.firstName = signUpDto.firstName;
+    userDto.email = signUpDto.email;
+    userDto.hashedPassword = hashedPassword;
 
-    const savedUser = await this.userRepository.save(user);
+    const savedUser = await this.userService.create(userDto);
 
     const payload: JwtPayload = { id: savedUser.id, email: savedUser.email };
 
@@ -40,7 +39,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.userRepository.findOne({ where: { email: loginDto.email } });
+    const user = await this.userService.findOneByEmail(loginDto.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');

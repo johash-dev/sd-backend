@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { StoryService } from './story.service';
 import { CreateStoryDto } from './dto/create-story.dto';
 import { AuthUser } from 'src/common/decorators';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 
 @Controller('story')
 export class StoryController {

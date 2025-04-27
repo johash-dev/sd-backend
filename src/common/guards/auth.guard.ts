@@ -5,7 +5,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { jwtConstants } from 'src/util/constants';
 import { Request } from 'express';
 import { JwtUserPayload } from '../types';
-import { UserService } from 'src/modules/auth/user.service';
+import { UserService } from 'src/modules/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
 
-      const user = await this.userService.findById(payload.id);
+      const user = await this.userService.findOneById(payload.id);
 
       request['user'] = user;
     } catch {

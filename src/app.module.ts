@@ -12,6 +12,7 @@ import { jwtConstants } from './util/constants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/auth.guard';
 import { StoryModule } from './modules/story/story.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { StoryModule } from './modules/story/story.module';
     RoomModule,
     AuthModule,
     StoryModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
