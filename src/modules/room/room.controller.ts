@@ -17,4 +17,9 @@ export class RoomController {
   getRoom(@Param('roomCode') roomCode: string) {
     return this.roomService.getRoom(roomCode);
   }
+
+  @Post('join/:roomCode')
+  joinRoom(@AuthUser() user: User, @Param('roomCode') roomCode: string) {
+    return this.roomService.joinRoom(user, roomCode);
+  }
 }
