@@ -16,6 +16,7 @@ export class Room {
   id: number;
 
   @Generated('uuid')
+  @Column()
   roomCode: string;
 
   @ManyToOne(() => User, (user) => user.rooms, { onDelete: 'CASCADE' })

@@ -10,6 +10,6 @@ export class StoryController {
 
   @Post()
   createStory(@AuthUser() user: User, @Body() createStoryDto: CreateStoryDto) {
-    return this.storyService.create(user.id, createStoryDto);
+    return this.storyService.create(user, createStoryDto);
   }
 }

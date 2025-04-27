@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Story } from './entities/story.entity';
 import { CreateStoryDto } from './dto/create-story.dto';
 import { RoomService } from '../room/room.service';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class StoryService {
@@ -12,28 +13,19 @@ export class StoryService {
     private roomService: RoomService,
   ) {}
 
-  async create(userId: number, createStoryDto: CreateStoryDto) {
-    const canCreateStory = await this.canCreateStory(userId, createStoryDto.roomId);
+  async create(user: User, createStoryDto: CreateStoryDto) {
+    const room = await this.roomService.findById(createStoryDto.roomId);
 
-    if (!canCreateStory) {
-      throw new BadRequestException();
+    console.log(room, user);
+
+    if (room.owner.id !== user.id) {
+      throw new UnauthorizedException('User not authorized to create stories for this room');
     }
 
     const story = new Story();
-    story.roomId = createStoryDto.roomId;
+    story.room = room;
     story.title = createStoryDto.title;
 
     return this.storyRepository.save(story);
-  }
-
-  private async canCreateStory(userId: number, roomId: number): Promise<boolean> {
-    console.log('userId', userId);
-    console.log('roomId', roomId);
-
-    const room = await this.roomService.findById(roomId);
-
-    console.log(room);
-
-    return userId === room.ownerId;
   }
 }
