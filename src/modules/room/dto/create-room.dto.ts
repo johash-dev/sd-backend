@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateRoomDto {
   @IsNotEmpty({ message: 'Owner Id cannot be empty' })
-  ownerId: string;
+  ownerId: number;
 
   @IsNotEmpty({ message: 'Room title cannot be empty' })
   title: string;

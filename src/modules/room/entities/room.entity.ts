@@ -3,13 +3,13 @@ import { Column, Entity, Generated, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Room {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Generated('uuid')
   roomCode: string;
 
   @Column()
-  ownerId: string;
+  ownerId: number;
 
   @Column()
   title: string;

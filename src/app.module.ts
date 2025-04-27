@@ -5,12 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomModule } from './modules/room/room.module';
 import { AuthModule } from './modules/auth/auth.module';
 
-import { User, Room } from './modules';
+import { User, Room, Story } from './modules';
 import { HashingService } from './util/hashing.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './util/constants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/auth.guard';
+import { StoryModule } from './modules/story/story.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { AuthGuard } from './common/guards/auth.guard';
       username: 'postgres',
       password: 'root',
       database: 'sd-db',
-      entities: [User, Room],
+      entities: [User, Room, Story],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -32,6 +33,7 @@ import { AuthGuard } from './common/guards/auth.guard';
     }),
     RoomModule,
     AuthModule,
+    StoryModule,
   ],
   controllers: [AppController],
   providers: [

@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { HashingService } from 'src/util/hashing.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/common/types';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +32,7 @@ export class AuthService {
 
     const savedUser = await this.userRepository.save(user);
 
-    const payload = { sub: savedUser.id, username: savedUser.email };
+    const payload: JwtPayload = { id: savedUser.id, email: savedUser.email };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -51,7 +52,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, username: user.email };
+    const payload: JwtPayload = { id: user.id, email: user.email };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
