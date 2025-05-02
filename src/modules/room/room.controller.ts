@@ -9,7 +9,7 @@ export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Post()
-  createRoom(@AuthUser() user: User, @Body() createRoomDto: CreateRoomDto) {
+  createRoom(user: User, @Body() createRoomDto: CreateRoomDto) {
     return this.roomService.create(user, createRoomDto);
   }
 

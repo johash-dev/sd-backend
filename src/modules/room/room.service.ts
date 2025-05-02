@@ -29,17 +29,30 @@ export class RoomService {
       throw new HttpException('You are the room owner', HttpStatus.CONFLICT);
     }
 
+    const existingParticipant = await this.participantService.getByIdAndRoomCode(user.id, room.id);
+
+    console.log(existingParticipant);
+
+    if (existingParticipant) {
+      return room;
+    }
+
     const participant = new Participant();
     participant.room = room;
     participant.user = user;
+    console.log('return', participant);
 
-    return this.participantService.create(participant);
+    const part = await this.participantService.create(participant);
+    if (part) {
+      const updatedRoom = await this.getRoom(roomCode);
+      return updatedRoom;
+    }
   }
 
   async getRoom(roomCode: string) {
     const room = await this.roomRepositiry.findOne({
       where: { roomCode },
-      relations: ['owner', 'stories', 'participants'],
+      relations: ['owner', 'stories', 'participants', 'participants.user'],
     });
     if (!room) {
       throw new NotFoundException('Room not found');

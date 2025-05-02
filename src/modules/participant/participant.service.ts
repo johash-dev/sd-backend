@@ -2,6 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { Participant } from './entities/participant.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
+import { Room } from '../room/entities/room.entity';
 
 @Injectable()
 export class ParticipantService {
@@ -11,11 +12,21 @@ export class ParticipantService {
 
   async create(participant: Participant) {
     try {
+      console.log('create participant');
+
       return await this.partcipantRepository.save(participant);
     } catch (e) {
       if (e instanceof QueryFailedError) {
         throw new ConflictException('User already joined this room');
       }
     }
+  }
+
+  async getByIdAndRoomCode(id: number, roomId: number) {
+    console.log(id, roomId);
+
+    return await this.partcipantRepository.findOne({
+      where: { user: { id }, room: { id: roomId } },
+    });
   }
 }
