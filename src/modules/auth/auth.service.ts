@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { ISignUpResponse } from 'src/common/types';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +15,9 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto) {
-    const existingUser = await this.userService.findOneByEmail(signUpDto.email);
-
-    if (existingUser) {
-      throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
+  async signUp(signUpDto: SignUpDto): Promise<ISignUpResponse> {
+    if (signUpDto.password !== signUpDto.confirmPassword) {
+      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
 
     const hashedPassword = await this.hashingService.getHashedString(signUpDto.password);
