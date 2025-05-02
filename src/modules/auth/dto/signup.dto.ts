@@ -28,7 +28,7 @@ export class SignUpResponseDto {
   token: string;
 
   @ApiProperty()
-  id: number;
+  id: string;
 
   @ApiProperty()
   firstName: string;

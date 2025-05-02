@@ -2,7 +2,6 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { Participant } from './entities/participant.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
-import { Room } from '../room/entities/room.entity';
 
 @Injectable()
 export class ParticipantService {
@@ -22,7 +21,7 @@ export class ParticipantService {
     }
   }
 
-  async getByIdAndRoomCode(id: number, roomId: number) {
+  async getByIdAndRoomCode(id: string, roomId: number) {
     console.log(id, roomId);
 
     return await this.partcipantRepository.findOne({

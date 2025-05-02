@@ -1,7 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto, SignUpResponseDto } from './dto/signup.dto';
-import { LoginDto } from './dto/login.dto';
+import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
@@ -23,7 +23,14 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  login(@Body() loginDto: LoginDto) {
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'User log in' })
+  @ApiResponse({
+    status: 200,
+    description: 'User logged in successfully!',
+    type: LoginResponseDto,
+  })
+  login(@Body() loginDto: LoginRequestDto) {
     return this.authService.login(loginDto);
   }
 }

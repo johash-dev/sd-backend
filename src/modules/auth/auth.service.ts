@@ -1,11 +1,10 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import { SignUpDto } from './dto/signup.dto';
+import { SignUpDto, SignUpResponseDto } from './dto/signup.dto';
 import { HashingService } from 'src/util/hashing.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { ISignUpResponse } from 'src/common/types';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +14,7 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<ISignUpResponse> {
+  async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
     if (signUpDto.password !== signUpDto.confirmPassword) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
@@ -37,8 +36,8 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.userService.findOneByEmail(loginDto.email);
+  async login(loginDto: LoginRequestDto): Promise<LoginResponseDto> {
+    const user = await this.userService.findOneByEmail(loginDto.email.toLowerCase());
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');

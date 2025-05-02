@@ -6,10 +6,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -46,7 +43,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       client.data = user;
     } catch (e) {
-      console.log('Authentication failed');
+      console.log('Authentication failed', e);
       client.disconnect();
     }
   }
