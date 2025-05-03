@@ -13,7 +13,15 @@ async function bootstrap() {
     .setTitle('Scrum Deck API')
     .setDescription('Scrum Deck API')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'Bearer',
+        bearerFormat: 'JWT', // Optional: for UI purposes
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

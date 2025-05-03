@@ -15,6 +15,8 @@ import { jwtConstants } from 'src/util/constants';
 import { JwtUserPayload } from 'src/common/types';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
+import { OnEvent } from '@nestjs/event-emitter';
+import { Story } from '../story/entities/story.entity';
 
 @WebSocketGateway({
   cors: {
@@ -58,18 +60,20 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const room = await this.roomService.create(client.data as User, createRoomDto);
     await client.join(room.roomCode);
-    console.log('client joined', room.roomCode);
 
     client.emit('createdRoom', room);
   }
 
   @SubscribeMessage('joinRoom')
   async joinRoomHandler(@ConnectedSocket() client: Socket, @MessageBody() roomCode: string) {
-    console.log('join room');
-
     const roomDetail = await this.roomService.joinRoom(client.data as User, roomCode);
-    // console.log('roomDetail', roomDetail);
+
     await client.join(roomCode);
     this.server.to(roomCode).emit('joinedRoom', roomDetail);
+  }
+
+  @OnEvent('story.created')
+  handleOrderCreatedEvent(story: Story) {
+    this.server.to(story.room.roomCode).emit('storyCreated', story);
   }
 }

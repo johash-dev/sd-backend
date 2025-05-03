@@ -3,13 +3,15 @@ import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { AuthUser } from 'src/common/decorators';
 import { User } from '../user/entities/user.entity';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth('access-token')
 @Controller('room')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Post()
-  createRoom(user: User, @Body() createRoomDto: CreateRoomDto) {
+  createRoom(@AuthUser() user: User, @Body() createRoomDto: CreateRoomDto) {
     return this.roomService.create(user, createRoomDto);
   }
 

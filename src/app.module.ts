@@ -10,6 +10,7 @@ import { HashingService } from './util/hashing.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './util/constants';
 import { APP_GUARD } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthGuard } from './common/guards/auth.guard';
 import { StoryModule } from './modules/story/story.module';
 import { UserModule } from './modules/user/user.module';
@@ -40,6 +41,7 @@ import { ParticipantModule } from './modules/participant/participant.module';
     UserModule,
     EstimationModule,
     ParticipantModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

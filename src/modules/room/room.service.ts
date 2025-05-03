@@ -14,7 +14,7 @@ export class RoomService {
     private participantService: ParticipantService,
   ) {}
 
-  create(user: User, createRoomDto: CreateRoomDto) {
+  create(user: User, createRoomDto: CreateRoomDto): Promise<Room> {
     const room = new Room();
     room.title = createRoomDto.title;
     room.owner = user;
@@ -31,8 +31,6 @@ export class RoomService {
 
     const existingParticipant = await this.participantService.getByIdAndRoomCode(user.id, room.id);
 
-    console.log(existingParticipant);
-
     if (existingParticipant) {
       return room;
     }
@@ -40,7 +38,6 @@ export class RoomService {
     const participant = new Participant();
     participant.room = room;
     participant.user = user;
-    console.log('return', participant);
 
     const part = await this.participantService.create(participant);
     if (part) {
@@ -61,7 +58,7 @@ export class RoomService {
     return room;
   }
 
-  async findById(roomId: number) {
+  async findById(roomId: string) {
     const room = await this.roomRepositiry.findOne({
       where: { id: roomId },
       relations: ['owner', 'stories'],

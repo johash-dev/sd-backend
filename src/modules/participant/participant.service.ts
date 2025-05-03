@@ -11,8 +11,6 @@ export class ParticipantService {
 
   async create(participant: Participant) {
     try {
-      console.log('create participant');
-
       return await this.partcipantRepository.save(participant);
     } catch (e) {
       if (e instanceof QueryFailedError) {
@@ -21,9 +19,7 @@ export class ParticipantService {
     }
   }
 
-  async getByIdAndRoomCode(id: string, roomId: number) {
-    console.log(id, roomId);
-
+  async getByIdAndRoomCode(id: string, roomId: string) {
     return await this.partcipantRepository.findOne({
       where: { user: { id }, room: { id: roomId } },
     });

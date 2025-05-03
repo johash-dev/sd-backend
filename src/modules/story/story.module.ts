@@ -10,5 +10,6 @@ import { RoomModule } from '../room/room.module';
   controllers: [StoryController],
   providers: [StoryService],
   imports: [TypeOrmModule.forFeature([Story]), AuthModule, RoomModule],
+  exports: [StoryService],
 })
 export class StoryModule {}

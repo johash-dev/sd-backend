@@ -1,6 +1,15 @@
 import { Estimation } from 'src/modules/estimation/entities/estimation.entity';
 import { Room } from 'src/modules/room/entities/room.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum UserStoryStatus {
   PENDING = 'pending',
@@ -10,8 +19,8 @@ export enum UserStoryStatus {
 
 @Entity()
 export class Story {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Room, (room) => room.stories, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'roomId' })
@@ -19,6 +28,12 @@ export class Story {
 
   @Column()
   title: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @OneToMany(() => Estimation, (estimation) => estimation.story)
   estimations: Estimation[];
