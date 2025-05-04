@@ -4,8 +4,8 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Estimation {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Story, (story) => story.estimations)
   story: Story;
@@ -13,14 +13,14 @@ export class Estimation {
   @ManyToOne(() => User, (user) => user.estimations)
   user: User;
 
-  @Column()
-  optimistic: number;
+  @Column({ nullable: true })
+  optimistic?: number;
 
-  @Column()
-  realistic: number;
+  @Column({ nullable: true })
+  realistic?: number;
 
-  @Column()
-  pessimistic: number;
+  @Column({ nullable: true })
+  pessimistic?: number;
 
   @Column()
   ready: boolean;

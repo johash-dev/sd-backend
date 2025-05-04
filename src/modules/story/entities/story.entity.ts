@@ -29,6 +29,9 @@ export class Story {
   @Column()
   title: string;
 
+  @Column({ default: false })
+  selected: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

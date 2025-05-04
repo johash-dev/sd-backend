@@ -6,12 +6,14 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from '../user/entities/user.entity';
 import { Participant } from '../participant/entities/participant.entity';
 import { ParticipantService } from '../participant/participant.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomRepositiry: Repository<Room>,
     private participantService: ParticipantService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   create(user: User, createRoomDto: CreateRoomDto): Promise<Room> {
@@ -26,7 +28,7 @@ export class RoomService {
     const room = await this.getRoom(roomCode);
 
     if (room.owner.id === user.id) {
-      throw new HttpException('You are the room owner', HttpStatus.CONFLICT);
+      return room;
     }
 
     const existingParticipant = await this.participantService.getByIdAndRoomCode(user.id, room.id);
@@ -69,4 +71,25 @@ export class RoomService {
 
     return room;
   }
+
+  async rejoinRoom(user: User, roomCode: string) {
+    const room = await this.getRoom(roomCode);
+    if (room.owner.id === user.id) {
+      return room;
+    } else {
+      const existingParticipant = room.participants.filter(
+        (participant) => participant.user.id === user.id,
+      );
+      if (existingParticipant) {
+        return room;
+      } else {
+        throw new HttpException('You are not a participant in this room', HttpStatus.BAD_GATEWAY);
+      }
+    }
+  }
+
+  // async getAllParticipants(roomId: string) {
+  //   const room = await this.findById(roomId);
+
+  // }
 }

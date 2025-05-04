@@ -11,3 +11,12 @@ export class StoryResponseDto {
 
   createdAt: Date;
 }
+
+export class UpdatedStoryResponseDto {
+  id: string;
+  roomId: string;
+  title: string;
+  status: UserStoryStatus;
+  selected: boolean;
+  updatedAt: Date;
+}

@@ -1,1 +1,18 @@
-export class CreateEstimationDto {}
+import { IsNotEmpty, IsOptional } from 'class-validator';
+
+export class CreateEstimationDto {
+  @IsNotEmpty()
+  storyId: string;
+
+  @IsOptional()
+  optimistic?: number;
+
+  @IsOptional()
+  realistic?: number;
+
+  @IsOptional()
+  pessimistic?: number;
+
+  @IsNotEmpty()
+  ready: boolean;
+}

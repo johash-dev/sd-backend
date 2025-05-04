@@ -17,6 +17,7 @@ import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Story } from '../story/entities/story.entity';
+import { StoryResponseDto, UpdatedStoryResponseDto } from '../story/dto/story-response.dto';
 
 @WebSocketGateway({
   cors: {
@@ -72,8 +73,30 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomCode).emit('joinedRoom', roomDetail);
   }
 
+  @SubscribeMessage('rejoinRoom')
+  async rejoinRoomHandler(@ConnectedSocket() client: Socket, @MessageBody() roomCode: string) {
+    const room = await this.roomService.rejoinRoom(client.data as User, roomCode);
+    await client.join(room.roomCode);
+    this.server.to(room.roomCode).emit('rejoined', room);
+  }
+
   @OnEvent('story.created')
-  handleOrderCreatedEvent(story: Story) {
-    this.server.to(story.room.roomCode).emit('storyCreated', story);
+  handleOrderCreatedEvent(story: Story, storyDto: StoryResponseDto) {
+    this.server.to(story.room.roomCode).emit('storyCreated', storyDto, story);
+  }
+
+  @OnEvent('story.updated')
+  handleStoryUpdatedEvent(story: Story, updatedStoryDto: UpdatedStoryResponseDto) {
+    console.log('emitted story.updated', updatedStoryDto);
+
+    this.server.to(story.room.roomCode).emit('storyUpdated', updatedStoryDto, story);
+  }
+
+  @OnEvent('story.startEstimation')
+  handleStartEstimationEvent(story: Story) {
+    console.log('Emit storyEstimationStarted');
+    console.log('ROOM CODE', story.room.roomCode);
+
+    this.server.to(story.room.roomCode).emit('storyEstimationStarted');
   }
 }
