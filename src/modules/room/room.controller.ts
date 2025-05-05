@@ -28,9 +28,4 @@ export class RoomController {
   joinRoom(@AuthUser() user: User, @Param('roomCode') roomCode: string) {
     return this.roomService.joinRoom(user, roomCode);
   }
-
-  @Post('rejoin/:roomCode')
-  rejoinRoom(@AuthUser() user: User, @Param('roomCode') roomCode: string) {
-    return this.roomService.rejoinRoom(user, roomCode);
-  }
 }

@@ -1,20 +1,14 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Room } from './entities/room.entity';
 import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from '../user/entities/user.entity';
-import { ParticipantService } from '../participant/participant.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RoomResponseDto } from './dto/room-response.dto';
 
 @Injectable()
 export class RoomService {
-  constructor(
-    @InjectRepository(Room) private roomRepositiry: Repository<Room>,
-    private participantService: ParticipantService,
-    private eventEmitter: EventEmitter2,
-  ) {}
+  constructor(@InjectRepository(Room) private roomRepositiry: Repository<Room>) {}
 
   save(room: Room) {
     return this.roomRepositiry.save(room);
@@ -27,36 +21,7 @@ export class RoomService {
 
     await this.roomRepositiry.save(room);
 
-    const newRoom = await this.findById(room.id);
-
-    const roomResponseDto = new RoomResponseDto();
-    roomResponseDto.id = newRoom.id;
-    roomResponseDto.title = newRoom.title;
-    roomResponseDto.description = newRoom.description;
-    roomResponseDto.owner = {
-      id: newRoom.owner.id,
-      email: newRoom.owner.email,
-      firstName: newRoom.owner.firstName,
-    };
-    roomResponseDto.participants =
-      newRoom.participants.map((participant) => {
-        return {
-          id: participant.id,
-          email: participant.email,
-          firstName: participant.firstName,
-        };
-      }) ?? [];
-    roomResponseDto.stories =
-      newRoom.stories.map((story) => {
-        return {
-          id: story.id,
-          title: story.title,
-          selected: story.selected,
-          status: story.status,
-        };
-      }) ?? [];
-
-    return roomResponseDto;
+    return await this.getRoom(room.roomCode);
   }
 
   async joinRoom(user: User, roomCode: string) {
@@ -78,9 +43,7 @@ export class RoomService {
 
     const savedRoom = await this.roomRepositiry.save(room);
     if (savedRoom) {
-      const updatedRoom = await this.getRoom(roomCode);
-
-      return updatedRoom;
+      return await this.getRoom(roomCode);
     }
   }
 
@@ -93,7 +56,35 @@ export class RoomService {
       throw new NotFoundException('Room not found');
     }
 
-    return room;
+    const roomResponse = new RoomResponseDto();
+    roomResponse.id = room.id;
+    roomResponse.description = room.description;
+    roomResponse.roomCode = room.roomCode;
+    roomResponse.title = room.title;
+    roomResponse.owner = {
+      id: room.owner.id,
+      firstName: room.owner.firstName,
+      email: room.owner.email,
+    };
+    roomResponse.participants =
+      room.participants.map((participant) => {
+        return {
+          id: participant.id,
+          email: participant.email,
+          firstName: participant.firstName,
+        };
+      }) ?? [];
+    roomResponse.stories =
+      room.stories.map((story) => {
+        return {
+          id: story.id,
+          title: story.title,
+          selected: story.selected,
+          status: story.status,
+        };
+      }) ?? [];
+
+    return roomResponse;
   }
 
   async findById(roomId: string) {
@@ -107,25 +98,4 @@ export class RoomService {
 
     return room;
   }
-
-  async rejoinRoom(user: User, roomCode: string) {
-    const room = await this.getRoom(roomCode);
-    if (room.owner.id === user.id) {
-      return room;
-    } else {
-      const existingParticipant = room.participants.filter(
-        (participant) => participant.id === user.id,
-      );
-      if (existingParticipant) {
-        return room;
-      } else {
-        throw new HttpException('You are not a participant in this room', HttpStatus.BAD_GATEWAY);
-      }
-    }
-  }
-
-  // async getAllParticipants(roomId: string) {
-  //   const room = await this.findById(roomId);
-
-  // }
 }
