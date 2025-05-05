@@ -4,14 +4,33 @@ import { CreateRoomHandler } from './handlers/create-room.handler';
 import { JoinRoomHandler } from './handlers/join-room.handler';
 import { SelectStoryHandler } from './handlers/select-story.handler';
 import { StartEstimationHandler } from './handlers/start-estimation.handler';
+import { UserReadyHandler } from './handlers/user-ready.handler';
+import { CreateStoryHandler } from './handlers/create-story.handler';
+import { RevealVotesHandler } from './handlers/reveal-votes.handler';
+import { socketServerProvider } from './providers/socket-server.provider';
 
 @Module({
   providers: [
+    socketServerProvider,
     RoomGateway,
     CreateRoomHandler,
     JoinRoomHandler,
     SelectStoryHandler,
     StartEstimationHandler,
+    UserReadyHandler,
+    CreateStoryHandler,
+    RevealVotesHandler,
+  ],
+  exports: [
+    socketServerProvider,
+    RoomGateway,
+    CreateRoomHandler,
+    JoinRoomHandler,
+    SelectStoryHandler,
+    StartEstimationHandler,
+    UserReadyHandler,
+    CreateStoryHandler,
+    RevealVotesHandler,
   ],
 })
 export class SocketModule {}
