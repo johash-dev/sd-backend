@@ -16,6 +16,7 @@ import { StoryModule } from './modules/story/story.module';
 import { UserModule } from './modules/user/user.module';
 import { EstimationModule } from './modules/estimation/estimation.module';
 import { ParticipantModule } from './modules/participant/participant.module';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ParticipantModule } from './modules/participant/participant.module';
     EstimationModule,
     ParticipantModule,
     EventEmitterModule.forRoot(),
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [

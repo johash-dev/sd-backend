@@ -4,6 +4,7 @@ import { CreateStoryDto, UpdateStoryDto } from './dto/create-story.dto';
 import { AuthUser } from 'src/common/decorators';
 import { User } from '../user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { SelectStoryDto } from './dto/select-story.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('story')
@@ -18,5 +19,10 @@ export class StoryController {
   @Patch()
   async updateStory(@AuthUser() user: User, @Body() updateStoryDto: UpdateStoryDto) {
     return await this.storyService.updateStory(user, updateStoryDto);
+  }
+
+  @Patch()
+  async selectStory(@AuthUser() user: User, @Body() selectStoryDto: SelectStoryDto) {
+    return await this.storyService.selectStory(selectStoryDto);
   }
 }

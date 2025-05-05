@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -12,9 +13,10 @@ import {
 } from 'typeorm';
 
 export enum UserStoryStatus {
-  PENDING = 'pending',
-  IN_ESTIMATION = 'in_estimation',
-  ESTIMATED = 'estimated',
+  PENDING = 'PENDING',
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  REVEALED = 'REVEALED',
 }
 
 @Entity()
@@ -30,6 +32,7 @@ export class Story {
   title: string;
 
   @Column({ default: false })
+  @Index()
   selected: boolean;
 
   @CreateDateColumn()

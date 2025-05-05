@@ -4,6 +4,7 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { AuthUser } from 'src/common/decorators';
 import { User } from '../user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { RoomResponseDto } from './dto/room-response.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('room')
@@ -11,8 +12,11 @@ export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Post()
-  createRoom(@AuthUser() user: User, @Body() createRoomDto: CreateRoomDto) {
-    return this.roomService.create(user, createRoomDto);
+  createRoom(
+    @AuthUser() user: User,
+    @Body() createRoomDto: CreateRoomDto,
+  ): Promise<RoomResponseDto> {
+    return this.roomService.createRoom(user, createRoomDto);
   }
 
   @Get(':roomCode')

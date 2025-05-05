@@ -1,10 +1,10 @@
 import { Estimation } from 'src/modules/estimation/entities/estimation.entity';
-import { Participant } from 'src/modules/participant/entities/participant.entity';
 import { Room } from 'src/modules/room/entities/room.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -33,8 +33,8 @@ export class User {
   @OneToMany(() => Room, (room) => room.owner)
   rooms: Room[];
 
-  @OneToMany(() => Participant, (participant) => participant.user)
-  participations: Participant[];
+  @ManyToMany(() => Room, (room) => room.participants)
+  participations: Room[];
 
   @OneToMany(() => Estimation, (estimation) => estimation.user)
   estimations: Estimation[];

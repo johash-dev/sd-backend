@@ -1,4 +1,3 @@
-import { Participant } from 'src/modules/participant/entities/participant.entity';
 import { Story } from 'src/modules/story/entities/story.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
@@ -7,6 +6,8 @@ import {
   Entity,
   Generated,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -19,7 +20,7 @@ export class Room {
   id: string;
 
   @Generated('uuid')
-  @Column()
+  @Column({ unique: true })
   roomCode: string;
 
   @ManyToOne(() => User, (user) => user.rooms, { onDelete: 'CASCADE' })
@@ -28,6 +29,9 @@ export class Room {
 
   @Column()
   title: string;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -38,6 +42,7 @@ export class Room {
   @OneToMany(() => Story, (story) => story.room)
   stories: Story[];
 
-  @OneToMany(() => Participant, (participant) => participant.room)
-  participants: Participant[];
+  @ManyToMany(() => User, (user) => user.participations)
+  @JoinTable()
+  participants: User[];
 }

@@ -4,9 +4,9 @@ import { Room } from './entities/room.entity';
 import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from '../user/entities/user.entity';
-import { Participant } from '../participant/entities/participant.entity';
 import { ParticipantService } from '../participant/participant.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { RoomResponseDto } from './dto/room-response.dto';
 
 @Injectable()
 export class RoomService {
@@ -16,12 +16,47 @@ export class RoomService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  create(user: User, createRoomDto: CreateRoomDto): Promise<Room> {
+  save(room: Room) {
+    return this.roomRepositiry.save(room);
+  }
+
+  async createRoom(user: User, createRoomDto: CreateRoomDto): Promise<RoomResponseDto> {
     const room = new Room();
     room.title = createRoomDto.title;
     room.owner = user;
 
-    return this.roomRepositiry.save(room);
+    await this.roomRepositiry.save(room);
+
+    const newRoom = await this.findById(room.id);
+
+    const roomResponseDto = new RoomResponseDto();
+    roomResponseDto.id = newRoom.id;
+    roomResponseDto.title = newRoom.title;
+    roomResponseDto.description = newRoom.description;
+    roomResponseDto.owner = {
+      id: newRoom.owner.id,
+      email: newRoom.owner.email,
+      firstName: newRoom.owner.firstName,
+    };
+    roomResponseDto.participants =
+      newRoom.participants.map((participant) => {
+        return {
+          id: participant.id,
+          email: participant.email,
+          firstName: participant.firstName,
+        };
+      }) ?? [];
+    roomResponseDto.stories =
+      newRoom.stories.map((story) => {
+        return {
+          id: story.id,
+          title: story.title,
+          selected: story.selected,
+          status: story.status,
+        };
+      }) ?? [];
+
+    return roomResponseDto;
   }
 
   async joinRoom(user: User, roomCode: string) {
@@ -31,19 +66,20 @@ export class RoomService {
       return room;
     }
 
-    const existingParticipant = await this.participantService.getByIdAndRoomCode(user.id, room.id);
+    const existingParticipant = room.participants.filter(
+      (participant) => participant.id === user.id,
+    );
 
-    if (existingParticipant) {
+    if (existingParticipant.length) {
       return room;
     }
 
-    const participant = new Participant();
-    participant.room = room;
-    participant.user = user;
+    room.participants.push(user);
 
-    const part = await this.participantService.create(participant);
-    if (part) {
+    const savedRoom = await this.roomRepositiry.save(room);
+    if (savedRoom) {
       const updatedRoom = await this.getRoom(roomCode);
+
       return updatedRoom;
     }
   }
@@ -51,7 +87,7 @@ export class RoomService {
   async getRoom(roomCode: string) {
     const room = await this.roomRepositiry.findOne({
       where: { roomCode },
-      relations: ['owner', 'stories', 'participants', 'participants.user'],
+      relations: ['owner', 'stories', 'participants'],
     });
     if (!room) {
       throw new NotFoundException('Room not found');
@@ -63,7 +99,7 @@ export class RoomService {
   async findById(roomId: string) {
     const room = await this.roomRepositiry.findOne({
       where: { id: roomId },
-      relations: ['owner', 'stories'],
+      relations: ['owner', 'stories', 'participants'],
     });
     if (!room) {
       throw new NotFoundException('Room not found');
@@ -78,7 +114,7 @@ export class RoomService {
       return room;
     } else {
       const existingParticipant = room.participants.filter(
-        (participant) => participant.user.id === user.id,
+        (participant) => participant.id === user.id,
       );
       if (existingParticipant) {
         return room;

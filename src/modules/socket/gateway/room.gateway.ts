@@ -8,16 +8,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { RoomService } from './room.service';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from 'src/util/constants';
-import { JwtUserPayload } from 'src/common/types';
-import { UserService } from '../user/user.service';
-import { User } from '../user/entities/user.entity';
-import { OnEvent } from '@nestjs/event-emitter';
-import { Story } from '../story/entities/story.entity';
-import { StoryResponseDto, UpdatedStoryResponseDto } from '../story/dto/story-response.dto';
+import { JoinRoomHandler } from '../handlers/join-room.handler';
+import { CreateRoomHandler } from '../handlers/create-room.handler';
+import { SOCKET_EVENTS } from '../constants/socket-events';
+import { JoinRoomDto } from '../dtos/input/join-room.dto';
+import { CreateStoryDto } from '../dtos/input/create-story.dto';
+import { CreateStoryHandler } from '../handlers/create-story.handler';
 
 @WebSocketGateway({
   cors: {
@@ -29,39 +25,35 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    private roomService: RoomService,
-    private jwtService: JwtService,
-    private userService: UserService,
+    private joinRoomHandler: JoinRoomHandler,
+    private createRoomHandler: CreateRoomHandler,
+    private createStoryHandler: CreateStoryHandler,
   ) {}
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    // const token = client.handshake.auth['token'] as string;
-    // console.log('connection');
-    // try {
-    //   const payload: JwtUserPayload = this.jwtService.verify(token, {
-    //     secret: jwtConstants.secret,
-    //   });
-    //   const user: User = await this.userService.findOneById(payload.id);
-    //   client.data = user;
-    // } catch (e) {
-    //   console.log('Authentication failed', e);
-    //   client.disconnect();
-    // }
+  handleConnection(@ConnectedSocket() client: Socket) {
+    console.log('client connected', client.id);
   }
   handleDisconnect(client: Socket) {
-    // console.log('client disconnected', client.id);
+    console.log('client disconnected', client.id);
   }
 
-  // @SubscribeMessage('createRoom')
-  // async createRoomHandler(
-  //   @ConnectedSocket() client: Socket,
-  //   @MessageBody() createRoomDto: CreateRoomDto,
-  // ) {
-  //   const room = await this.roomService.create(client.data as User, createRoomDto);
-  //   await client.join(room.roomCode);
+  @SubscribeMessage(SOCKET_EVENTS.CREATE_ROOM)
+  handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() createRoomDto: JoinRoomDto) {
+    this.createRoomHandler.execute(client, createRoomDto);
+  }
 
-  //   client.emit('createdRoom', room);
-  // }
+  @SubscribeMessage(SOCKET_EVENTS.JOIN_ROOM)
+  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() createRoomDto: JoinRoomDto) {
+    this.joinRoomHandler.execute(client, createRoomDto);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.CREATE_STORY)
+  handleCreateStory(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() createRoomDto: CreateStoryDto,
+  ) {
+    this.createStoryHandler.execute(client, createRoomDto);
+  }
 
   // @SubscribeMessage('joinRoom')
   // async joinRoomHandler(@ConnectedSocket() client: Socket, @MessageBody() roomCode: string) {

@@ -7,6 +7,7 @@ import { RoomService } from '../room/room.service';
 import { User } from '../user/entities/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StoryResponseDto } from './dto/story-response.dto';
+import { SelectStoryDto } from './dto/select-story.dto';
 
 @Injectable()
 export class StoryService {
@@ -88,5 +89,18 @@ export class StoryService {
       }
       return this.storyRepository.save(story);
     }
+  }
+
+  async selectStory(selectStoryDto: SelectStoryDto) {
+    const room = await this.roomService.findById(selectStoryDto.roomId);
+    room.stories.forEach((story) => {
+      if (story.id === selectStoryDto.storyId) {
+        story.selected = true;
+      }
+      story.selected = false;
+    });
+    await this.roomService.save(room);
+    const updatedRoom = await this.roomService.findById(room.id);
+    this.eventEmitter.emit('story.storySelected', updatedRoom.stories, updatedRoom.roomCode);
   }
 }
