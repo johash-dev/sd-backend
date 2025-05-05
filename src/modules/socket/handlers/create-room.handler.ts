@@ -8,7 +8,8 @@ import { SOCKET_SERVER } from '../constants/socket';
 export class CreateRoomHandler {
   constructor(@Inject(SOCKET_SERVER) private readonly server: Server) {}
 
-  execute(client: Socket, data: JoinRoomDto) {
+  async execute(client: Socket, data: JoinRoomDto) {
+    await client.join(data.roomCode);
     client.emit(SOCKET_EVENTS.CREATED_ROOM, data);
   }
 }

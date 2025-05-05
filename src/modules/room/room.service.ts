@@ -4,7 +4,7 @@ import { Room } from './entities/room.entity';
 import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from '../user/entities/user.entity';
-import { RoomResponseDto } from './dto/room-response.dto';
+import { JoinRoomResponseDto, RoomResponseDto } from './dto/room-response.dto';
 
 @Injectable()
 export class RoomService {
@@ -24,11 +24,14 @@ export class RoomService {
     return await this.getRoom(room.roomCode);
   }
 
-  async joinRoom(user: User, roomCode: string) {
+  async joinRoom(user: User, roomCode: string): Promise<JoinRoomResponseDto> {
     const room = await this.getRoom(roomCode);
 
     if (room.owner.id === user.id) {
-      return room;
+      return {
+        room,
+        user,
+      };
     }
 
     const existingParticipant = room.participants.filter(
@@ -36,15 +39,21 @@ export class RoomService {
     );
 
     if (existingParticipant.length) {
-      return room;
+      return {
+        room,
+        user,
+      };
     }
 
     room.participants.push(user);
 
-    const savedRoom = await this.roomRepositiry.save(room);
-    if (savedRoom) {
-      return await this.getRoom(roomCode);
-    }
+    await this.roomRepositiry.save(room);
+
+    const roomResponse = await this.getRoom(room.roomCode);
+    return {
+      room: roomResponse,
+      user: user,
+    };
   }
 
   async getRoom(roomCode: string) {

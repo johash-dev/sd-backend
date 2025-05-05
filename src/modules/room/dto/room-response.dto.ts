@@ -10,3 +10,8 @@ export class RoomResponseDto {
   participants: UserResponseDto[];
   stories: StorySummaryDto[];
 }
+
+export class JoinRoomResponseDto {
+  room: RoomResponseDto;
+  user: UserResponseDto;
+}

@@ -46,13 +46,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(SOCKET_EVENTS.CREATE_ROOM)
-  handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() createRoomDto: JoinRoomDto) {
-    this.createRoomHandler.execute(client, createRoomDto);
+  async handleCreateRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() createRoomDto: JoinRoomDto,
+  ) {
+    await this.createRoomHandler.execute(client, createRoomDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.JOIN_ROOM)
-  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
-    this.joinRoomHandler.execute(client, joinRoomDto);
+  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
+    await this.joinRoomHandler.execute(client, joinRoomDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.CREATE_STORY)
