@@ -2,20 +2,31 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Story, UserStoryStatus } from './entities/story.entity';
-import { CreateStoryDto, UpdateStoryDto } from './dto/create-story.dto';
+import { CreateStoryDto } from './dto/create-story.dto';
 import { RoomService } from '../room/room.service';
 import { User } from '../user/entities/user.entity';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StoryResponseDto } from './dto/story-response.dto';
 import { SelectStoryDto } from './dto/select-story.dto';
+import { StartEstimationDto } from './dto/start-estimation.dto';
 
 @Injectable()
 export class StoryService {
   constructor(
     @InjectRepository(Story) private storyRepository: Repository<Story>,
     private roomService: RoomService,
-    private eventEmitter: EventEmitter2,
   ) {}
+
+  async getStory(id: string) {
+    const story = await this.storyRepository.findOne({
+      where: { id },
+      relations: ['room', 'estimations'],
+    });
+    if (!story) {
+      throw new NotFoundException('Story Not Found');
+    }
+
+    return story;
+  }
 
   async getById(storyId: string) {
     const story = await this.storyRepository.findOne({
@@ -26,7 +37,14 @@ export class StoryService {
       throw new NotFoundException('Story Not Found');
     }
 
-    return story;
+    const storyResponseDto = new StoryResponseDto();
+    storyResponseDto.id = story.id;
+    storyResponseDto.roomId = story.room.id;
+    storyResponseDto.title = story.title;
+    storyResponseDto.status = story.status;
+    storyResponseDto.selected = story.selected;
+
+    return storyResponseDto;
   }
 
   async create(user: User, createStoryDto: CreateStoryDto): Promise<StoryResponseDto> {
@@ -42,43 +60,7 @@ export class StoryService {
 
     const savedStory = await this.storyRepository.save(story);
 
-    return {
-      id: savedStory.id,
-      roomId: savedStory.room.id,
-      title: savedStory.title,
-      status: savedStory.status,
-      selected: savedStory.selected,
-    };
-  }
-
-  async updateStory(user: User, updateStoryDto: UpdateStoryDto) {
-    const story = await this.storyRepository.findOne({
-      where: { id: updateStoryDto.id },
-      relations: ['room'],
-    });
-    const room = await this.roomService.findById(updateStoryDto.roomId);
-
-    if (room.owner.id !== user.id) {
-      throw new UnauthorizedException('Only room owner can update stories');
-    }
-
-    if (story) {
-      story.selected = updateStoryDto.selected ?? story.selected;
-      story.status = updateStoryDto.status ?? story.status;
-      story.title = updateStoryDto.title ?? story.title;
-      this.eventEmitter.emit('story.updated', story, {
-        id: story.id,
-        roomId: story.room.id,
-        title: story.title,
-        status: story.status,
-        selected: story.selected,
-        updatedAt: story.updatedAt,
-      });
-      if (story.status === UserStoryStatus.ACTIVE) {
-        this.eventEmitter.emit('story.startEstimation', story);
-      }
-      return this.storyRepository.save(story);
-    }
+    return await this.getById(savedStory.id);
   }
 
   async selectStory(selectStoryDto: SelectStoryDto) {
@@ -90,7 +72,18 @@ export class StoryService {
       story.selected = false;
     });
     await this.roomService.save(room);
-    const updatedRoom = await this.roomService.findById(room.id);
-    this.eventEmitter.emit('story.storySelected', updatedRoom.stories, updatedRoom.roomCode);
+    return await this.roomService.getRoom(room.roomCode);
+  }
+
+  async startEstimation(startEstimationDto: StartEstimationDto) {
+    const room = await this.roomService.findById(startEstimationDto.roomId);
+    room.stories.forEach((story) => {
+      if (story.id === startEstimationDto.storyId) {
+        story.status = UserStoryStatus.ACTIVE;
+      }
+      story.selected = false;
+    });
+    await this.roomService.save(room);
+    return await this.roomService.getRoom(room.roomCode);
   }
 }

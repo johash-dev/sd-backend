@@ -2,6 +2,9 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateEstimationDto {
   @IsNotEmpty()
+  roomId: string;
+
+  @IsNotEmpty()
   storyId: string;
 
   @IsOptional()

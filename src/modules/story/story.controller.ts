@@ -1,11 +1,12 @@
 import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { StoryService } from './story.service';
-import { CreateStoryDto, UpdateStoryDto } from './dto/create-story.dto';
+import { CreateStoryDto } from './dto/create-story.dto';
 import { AuthUser } from 'src/common/decorators';
 import { User } from '../user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { SelectStoryDto } from './dto/select-story.dto';
 import { StoryResponseDto } from './dto/story-response.dto';
+import { StartEstimationDto } from './dto/start-estimation.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('story')
@@ -21,12 +22,12 @@ export class StoryController {
   }
 
   @Patch()
-  async updateStory(@AuthUser() user: User, @Body() updateStoryDto: UpdateStoryDto) {
-    return await this.storyService.updateStory(user, updateStoryDto);
+  async selectStory(@AuthUser() user: User, @Body() selectStoryDto: SelectStoryDto) {
+    return await this.storyService.selectStory(selectStoryDto);
   }
 
   @Patch()
-  async selectStory(@AuthUser() user: User, @Body() selectStoryDto: SelectStoryDto) {
-    return await this.storyService.selectStory(selectStoryDto);
+  async startEstimation(@AuthUser() user: User, @Body() startEstimationDto: StartEstimationDto) {
+    return await this.storyService.startEstimation(startEstimationDto);
   }
 }
