@@ -42,22 +42,12 @@ export class StoryService {
 
     const savedStory = await this.storyRepository.save(story);
 
-    if (savedStory) {
-      this.eventEmitter.emit('story.created', savedStory, {
-        id: savedStory.id,
-        roomId: savedStory.room.id,
-        title: savedStory.title,
-        status: savedStory.status,
-        createdAt: savedStory.createdAt,
-      });
-    }
-
     return {
       id: savedStory.id,
       roomId: savedStory.room.id,
       title: savedStory.title,
       status: savedStory.status,
-      createdAt: savedStory.createdAt,
+      selected: savedStory.selected,
     };
   }
 
@@ -84,7 +74,7 @@ export class StoryService {
         selected: story.selected,
         updatedAt: story.updatedAt,
       });
-      if (story.status === UserStoryStatus.IN_ESTIMATION) {
+      if (story.status === UserStoryStatus.ACTIVE) {
         this.eventEmitter.emit('story.startEstimation', story);
       }
       return this.storyRepository.save(story);

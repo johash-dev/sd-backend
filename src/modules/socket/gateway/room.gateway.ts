@@ -14,6 +14,14 @@ import { SOCKET_EVENTS } from '../constants/socket-events';
 import { JoinRoomDto } from '../dtos/input/join-room.dto';
 import { CreateStoryDto } from '../dtos/input/create-story.dto';
 import { CreateStoryHandler } from '../handlers/create-story.handler';
+import { SelectStoryHandler } from '../handlers/select-story.handler';
+import { SelectStoryDto } from '../dtos/input/select-story.dto';
+import { StartEstimationDto } from '../dtos/input/start-estimation.dto';
+import { StartEstimationHandler } from '../handlers/start-estimation.handler';
+import { UserReadyHandler } from '../handlers/user-ready.handler';
+import { ReadyDto } from '../dtos/input/ready.dto';
+import { RevealVotesHandler } from '../handlers/reveal-votes.handler';
+import { RevealVotesDto } from '../dtos/input/reveal-votes.dto';
 
 @WebSocketGateway({
   cors: {
@@ -28,6 +36,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private joinRoomHandler: JoinRoomHandler,
     private createRoomHandler: CreateRoomHandler,
     private createStoryHandler: CreateStoryHandler,
+    private selectStoryHandler: SelectStoryHandler,
+    private startEstimationHandler: StartEstimationHandler,
+    private userReadyHandler: UserReadyHandler,
+    private revealVotesHandler: RevealVotesHandler,
   ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -43,16 +55,45 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(SOCKET_EVENTS.JOIN_ROOM)
-  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() createRoomDto: JoinRoomDto) {
-    this.joinRoomHandler.execute(client, createRoomDto);
+  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
+    this.joinRoomHandler.execute(client, joinRoomDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.CREATE_STORY)
   handleCreateStory(
     @ConnectedSocket() client: Socket,
-    @MessageBody() createRoomDto: CreateStoryDto,
+    @MessageBody() createStoryDto: CreateStoryDto,
   ) {
-    this.createStoryHandler.execute(client, createRoomDto);
+    this.createStoryHandler.execute(client, createStoryDto);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.SELECT_STORY)
+  handleSelectStory(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() selectStoryDto: SelectStoryDto,
+  ) {
+    this.selectStoryHandler.execute(client, selectStoryDto);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.START_ESTIMATION)
+  handleStartEstimation(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() startEstimationDto: StartEstimationDto,
+  ) {
+    this.startEstimationHandler.execute(client, startEstimationDto);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.READY)
+  handleUserReady(@ConnectedSocket() client: Socket, @MessageBody() readyDto: ReadyDto) {
+    this.userReadyHandler.execute(client, readyDto);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.REVEAL_VOTES)
+  handleRevealVotes(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() revealVotesDto: RevealVotesDto,
+  ) {
+    this.revealVotesHandler.execute(client, revealVotesDto);
   }
 
   // @SubscribeMessage('joinRoom')

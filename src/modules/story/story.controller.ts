@@ -5,6 +5,7 @@ import { AuthUser } from 'src/common/decorators';
 import { User } from '../user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { SelectStoryDto } from './dto/select-story.dto';
+import { StoryResponseDto } from './dto/story-response.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('story')
@@ -12,7 +13,10 @@ export class StoryController {
   constructor(private readonly storyService: StoryService) {}
 
   @Post()
-  async createStory(@AuthUser() user: User, @Body() createStoryDto: CreateStoryDto) {
+  async createStory(
+    @AuthUser() user: User,
+    @Body() createStoryDto: CreateStoryDto,
+  ): Promise<StoryResponseDto> {
     return await this.storyService.create(user, createStoryDto);
   }
 
