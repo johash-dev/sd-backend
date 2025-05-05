@@ -7,11 +7,9 @@ import { StartEstimationHandler } from './handlers/start-estimation.handler';
 import { UserReadyHandler } from './handlers/user-ready.handler';
 import { CreateStoryHandler } from './handlers/create-story.handler';
 import { RevealVotesHandler } from './handlers/reveal-votes.handler';
-import { socketServerProvider } from './providers/socket-server.provider';
 
 @Module({
   providers: [
-    socketServerProvider,
     RoomGateway,
     CreateRoomHandler,
     JoinRoomHandler,
@@ -22,7 +20,6 @@ import { socketServerProvider } from './providers/socket-server.provider';
     RevealVotesHandler,
   ],
   exports: [
-    socketServerProvider,
     RoomGateway,
     CreateRoomHandler,
     JoinRoomHandler,

@@ -5,8 +5,9 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { JoinRoomHandler } from '../handlers/join-room.handler';
 import { CreateRoomHandler } from '../handlers/create-room.handler';
 import { SOCKET_EVENTS } from '../constants/socket-events';
@@ -28,6 +29,9 @@ import { RevealVotesDto } from '../dtos/input/reveal-votes.dto';
   },
 })
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer()
+  public server: Server;
+
   constructor(
     private joinRoomHandler: JoinRoomHandler,
     private createRoomHandler: CreateRoomHandler,
@@ -55,7 +59,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(SOCKET_EVENTS.JOIN_ROOM)
   async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
-    await this.joinRoomHandler.execute(client, joinRoomDto);
+    await this.joinRoomHandler.execute(this.server, client, joinRoomDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.CREATE_STORY)
@@ -63,7 +67,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() createStoryDto: CreateStoryDto,
   ) {
-    this.createStoryHandler.execute(client, createStoryDto);
+    this.createStoryHandler.execute(this.server, client, createStoryDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.SELECT_STORY)
@@ -71,7 +75,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() selectStoryDto: SelectStoryDto,
   ) {
-    this.selectStoryHandler.execute(client, selectStoryDto);
+    this.selectStoryHandler.execute(this.server, client, selectStoryDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.START_ESTIMATION)
@@ -79,12 +83,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() startEstimationDto: StartEstimationDto,
   ) {
-    this.startEstimationHandler.execute(client, startEstimationDto);
+    this.startEstimationHandler.execute(this.server, client, startEstimationDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.READY)
   handleUserReady(@ConnectedSocket() client: Socket, @MessageBody() readyDto: ReadyDto) {
-    this.userReadyHandler.execute(client, readyDto);
+    this.userReadyHandler.execute(this.server, client, readyDto);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.REVEAL_VOTES)
@@ -92,6 +96,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() revealVotesDto: RevealVotesDto,
   ) {
-    this.revealVotesHandler.execute(client, revealVotesDto);
+    this.revealVotesHandler.execute(this.server, client, revealVotesDto);
   }
 }
