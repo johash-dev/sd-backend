@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomModule } from './modules/room/room.module';
 import { AuthModule } from './modules/auth/auth.module';
 
-import { User, Room, Story, Participant, Estimation } from './modules';
+import { User, Room, Story, Estimation } from './modules';
 import { HashingService } from './util/hashing.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './util/constants';
@@ -15,7 +15,6 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { StoryModule } from './modules/story/story.module';
 import { UserModule } from './modules/user/user.module';
 import { EstimationModule } from './modules/estimation/estimation.module';
-import { ParticipantModule } from './modules/participant/participant.module';
 import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
@@ -27,21 +26,20 @@ import { SocketModule } from './modules/socket/socket.module';
       username: 'postgres',
       password: 'root',
       database: 'sd-db',
-      entities: [User, Room, Story, Participant, Estimation],
+      entities: [User, Room, Story, Estimation],
       autoLoadEntities: true,
       synchronize: true,
     }),
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '7d' },
+      signOptions: { expiresIn: '1d' },
     }),
     RoomModule,
     AuthModule,
     StoryModule,
     UserModule,
     EstimationModule,
-    ParticipantModule,
     EventEmitterModule.forRoot(),
     SocketModule,
   ],
