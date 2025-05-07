@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,12 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const userResponseDto = new UserResponseDto();
+    userResponseDto.id = user.id;
+    userResponseDto.firstName = user.firstName;
+    userResponseDto.email = user.email;
+
+    return userResponseDto;
   }
 
   async findOneByEmail(email: string) {
