@@ -10,3 +10,7 @@ export type JwtUserPayload = {
   iat: number;
   exp: number;
 };
+
+export type JwtResponse = {
+  id: string;
+};

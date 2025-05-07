@@ -5,6 +5,8 @@ import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { jwtConstants } from 'src/util/constants';
+import { JwtResponse } from 'src/common/types';
 
 @Injectable()
 export class AuthService {
@@ -55,5 +57,20 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
     };
+  }
+
+  async verifyToken(token: string): Promise<LoginResponseDto> {
+    try {
+      const decoded = await this.jwtService.verifyAsync<JwtResponse>(token, {
+        secret: jwtConstants.secret,
+      });
+      const userResponse = await this.userService.findOneById(decoded.id);
+      return {
+        token,
+        ...userResponse,
+      };
+    } catch (error: unknown) {
+      throw new UnauthorizedException('Invalid or expired token', { cause: error });
+    }
   }
 }

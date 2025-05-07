@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto, SignUpResponseDto } from './dto/signup.dto';
 import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
@@ -32,5 +32,11 @@ export class AuthController {
   })
   login(@Body() loginDto: LoginRequestDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Public()
+  @Post('token/:token')
+  verifyToken(@Param('token') token: string) {
+    return this.authService.verifyToken(token);
   }
 }
