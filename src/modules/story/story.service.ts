@@ -84,7 +84,6 @@ export class StoryService {
       if (story.id === startEstimationDto.storyId) {
         story.status = UserStoryStatus.ACTIVE;
       }
-      story.selected = false;
     });
     await this.roomService.save(room);
     return await this.roomService.getRoom(room.roomCode);
