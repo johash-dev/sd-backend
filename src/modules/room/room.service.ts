@@ -107,4 +107,47 @@ export class RoomService {
 
     return room;
   }
+
+  async getRooms(user: User): Promise<RoomResponseDto[]> {
+    const rooms = await this.roomRepositiry.find({
+      where: [{ owner: { id: user.id } }, { participants: { id: user.id } }],
+      relations: ['owner', 'participants', 'stories'],
+      order: { createdAt: { direction: 'ASC' } },
+    });
+
+    const roomsResponse: Array<RoomResponseDto> = [];
+
+    rooms.map((room) => {
+      const roomResponseDto = new RoomResponseDto();
+      roomResponseDto.id = room.id;
+      roomResponseDto.title = room.title;
+      roomResponseDto.description = room.description;
+      roomResponseDto.roomCode = room.roomCode;
+      roomResponseDto.owner = {
+        id: room.owner.id,
+        firstName: room.owner.firstName,
+        email: room.owner.email,
+      };
+      roomResponseDto.participants =
+        room.participants.map((participant) => {
+          return {
+            id: participant.id,
+            email: participant.email,
+            firstName: participant.firstName,
+          };
+        }) ?? [];
+      roomResponseDto.stories =
+        room.stories.map((story) => {
+          return {
+            id: story.id,
+            title: story.title,
+            selected: story.selected,
+            status: story.status,
+          };
+        }) ?? [];
+      roomsResponse.push(roomResponseDto);
+    });
+
+    return roomsResponse;
+  }
 }
