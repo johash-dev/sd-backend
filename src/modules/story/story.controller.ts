@@ -21,12 +21,12 @@ export class StoryController {
     return await this.storyService.create(user, createStoryDto);
   }
 
-  @Patch()
+  @Patch('select')
   async selectStory(@AuthUser() user: User, @Body() selectStoryDto: SelectStoryDto) {
     return await this.storyService.selectStory(selectStoryDto);
   }
 
-  @Patch()
+  @Patch('startEstimation')
   async startEstimation(@AuthUser() user: User, @Body() startEstimationDto: StartEstimationDto) {
     return await this.storyService.startEstimation(startEstimationDto);
   }

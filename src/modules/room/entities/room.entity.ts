@@ -39,7 +39,7 @@ export class Room {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Story, (story) => story.room)
+  @OneToMany(() => Story, (story) => story.room, { cascade: ['update'] })
   stories: Story[];
 
   @ManyToMany(() => User, (user) => user.participations)

@@ -64,13 +64,16 @@ export class StoryService {
   }
 
   async selectStory(selectStoryDto: SelectStoryDto) {
-    const room = await this.roomService.findById(selectStoryDto.roomId);
+    const roomDto = await this.roomService.getRoom(selectStoryDto.roomCode);
+    const room = await this.roomService.findById(roomDto.id);
     room.stories.forEach((story) => {
       if (story.id === selectStoryDto.storyId) {
         story.selected = true;
+      } else {
+        story.selected = false;
       }
-      story.selected = false;
     });
+
     await this.roomService.save(room);
     return await this.roomService.getRoom(room.roomCode);
   }
