@@ -41,7 +41,7 @@ export class Story {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Estimation, (estimation) => estimation.story)
+  @OneToMany(() => Estimation, (estimation) => estimation.story, { cascade: ['update', 'remove'] })
   estimations: Estimation[];
 
   @Column({ type: 'enum', enum: UserStoryStatus, default: UserStoryStatus.PENDING })

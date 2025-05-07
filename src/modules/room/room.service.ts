@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from '../user/entities/user.entity';
 import { JoinRoomResponseDto, RoomResponseDto } from './dto/room-response.dto';
+import { EstimationResponseDto } from '../estimation/dto/estimation-response.dto';
 
 @Injectable()
 export class RoomService {
@@ -59,7 +60,13 @@ export class RoomService {
   async getRoom(roomCode: string) {
     const room = await this.roomRepositiry.findOne({
       where: { roomCode },
-      relations: ['owner', 'stories', 'participants'],
+      relations: [
+        'owner',
+        'stories',
+        'stories.estimations',
+        'stories.estimations.user',
+        'participants',
+      ],
     });
     if (!room) {
       throw new NotFoundException('Room not found');
@@ -90,6 +97,18 @@ export class RoomService {
           title: story.title,
           selected: story.selected,
           status: story.status,
+          estimations:
+            story.estimations.map((e): EstimationResponseDto => {
+              return {
+                id: e.id,
+                ready: e.ready,
+                storyId: story.id,
+                user: e.user,
+                optimistic: e.optimistic,
+                pessimistic: e.pessimistic,
+                realistic: e.realistic,
+              };
+            }) ?? [],
         };
       }) ?? [];
 

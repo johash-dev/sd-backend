@@ -1,7 +1,9 @@
+import { UserResponseDto } from 'src/modules/user/dto/user-response.dto';
+
 export class EstimationResponseDto {
   id: string;
   storyId: string;
-  userId: string;
+  user: UserResponseDto;
   optimistic?: number;
   realistic?: number;
   pessimistic?: number;
