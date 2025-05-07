@@ -19,6 +19,11 @@ export class RoomController {
     return this.roomService.createRoom(user, createRoomDto);
   }
 
+  @Get('getAll')
+  getAllRooms(@AuthUser() user: User) {
+    return this.roomService.getRooms(user);
+  }
+
   @Get(':roomCode')
   getRoom(@Param('roomCode') roomCode: string) {
     return this.roomService.getRoom(roomCode);
