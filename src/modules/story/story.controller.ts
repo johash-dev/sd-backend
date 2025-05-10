@@ -7,6 +7,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { SelectStoryDto } from './dto/select-story.dto';
 import { StoryResponseDto } from './dto/story-response.dto';
 import { StartEstimationDto } from './dto/start-estimation.dto';
+import { RevealStoryEstimateDto } from './dto/reveal-story-estimate.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('story')
@@ -29,5 +30,10 @@ export class StoryController {
   @Patch('startEstimation')
   async startEstimation(@AuthUser() user: User, @Body() startEstimationDto: StartEstimationDto) {
     return await this.storyService.startEstimation(startEstimationDto);
+  }
+
+  @Patch('revealEstimate')
+  async revealEstimate(@AuthUser() user: User, @Body() revealEstimateDto: RevealStoryEstimateDto) {
+    return await this.storyService.revealEstimate(revealEstimateDto);
   }
 }

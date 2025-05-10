@@ -6,6 +6,6 @@ import { RevealVotesDto } from '../dtos/input/reveal-votes.dto';
 @Injectable()
 export class RevealVotesHandler {
   execute(server: Server, client: Socket, data: RevealVotesDto) {
-    server.to(data.roomCode).emit(SOCKET_EVENTS.REVEALED, data.storyId);
+    server.to(data.roomCode).emit(SOCKET_EVENTS.REVEALED, data);
   }
 }
