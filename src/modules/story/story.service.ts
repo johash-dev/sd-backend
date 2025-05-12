@@ -9,6 +9,7 @@ import { StoryResponseDto } from './dto/story-response.dto';
 import { SelectStoryDto } from './dto/select-story.dto';
 import { StartEstimationDto } from './dto/start-estimation.dto';
 import { RevealStoryEstimateDto } from './dto/reveal-story-estimate.dto';
+import { ReEstimateDto } from './dto/re-estimate.dto';
 
 @Injectable()
 export class StoryService {
@@ -84,6 +85,18 @@ export class StoryService {
     room.stories.forEach((story) => {
       if (story.id === startEstimationDto.storyId) {
         story.status = UserStoryStatus.ACTIVE;
+      }
+    });
+    await this.roomService.save(room);
+    return await this.roomService.getRoom(room.roomCode);
+  }
+
+  async reEstimate(reEstimateDto: ReEstimateDto) {
+    const room = await this.roomService.findById(reEstimateDto.roomId);
+    room.stories.forEach((story) => {
+      if (story.id === reEstimateDto.storyId) {
+        story.status = UserStoryStatus.ACTIVE;
+        story.estimations = [];
       }
     });
     await this.roomService.save(room);

@@ -22,6 +22,8 @@ import { UserReadyHandler } from '../handlers/user-ready.handler';
 import { ReadyDto } from '../dtos/input/ready.dto';
 import { RevealVotesHandler } from '../handlers/reveal-votes.handler';
 import { RevealVotesDto } from '../dtos/input/reveal-votes.dto';
+import { ReEstimateDto } from '../dtos/input/re-estimate.dto';
+import { ReEstimateHandler } from '../handlers/re-estimate.handler';
 
 @WebSocketGateway({
   cors: {
@@ -40,6 +42,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private startEstimationHandler: StartEstimationHandler,
     private userReadyHandler: UserReadyHandler,
     private revealVotesHandler: RevealVotesHandler,
+    private reEstimateHandler: ReEstimateHandler,
   ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -97,5 +100,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() revealVotesDto: RevealVotesDto,
   ) {
     this.revealVotesHandler.execute(this.server, client, revealVotesDto);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.RE_ESTIMATE)
+  handleReEstimate(@ConnectedSocket() client: Socket, @MessageBody() reEstimateDto: ReEstimateDto) {
+    this.reEstimateHandler.execute(this.server, client, reEstimateDto);
   }
 }

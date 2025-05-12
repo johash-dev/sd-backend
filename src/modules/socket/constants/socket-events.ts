@@ -16,4 +16,5 @@ export const SOCKET_EVENTS = {
   SELECTED_STORY: 'selected-story',
   START_ESTIMATION: 'start-estimation',
   STARTED_ESTIMATION: 'started-estimation',
+  RE_ESTIMATE: 're-estimate',
 };

@@ -118,7 +118,7 @@ export class RoomService {
   async findById(roomId: string) {
     const room = await this.roomRepositiry.findOne({
       where: { id: roomId },
-      relations: ['owner', 'stories', 'participants'],
+      relations: ['owner', 'stories', 'stories.estimations', 'participants'],
     });
     if (!room) {
       throw new NotFoundException('Room not found');

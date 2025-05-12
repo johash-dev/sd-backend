@@ -8,6 +8,7 @@ import { SelectStoryDto } from './dto/select-story.dto';
 import { StoryResponseDto } from './dto/story-response.dto';
 import { StartEstimationDto } from './dto/start-estimation.dto';
 import { RevealStoryEstimateDto } from './dto/reveal-story-estimate.dto';
+import { ReEstimateDto } from './dto/re-estimate.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('story')
@@ -30,6 +31,11 @@ export class StoryController {
   @Patch('startEstimation')
   async startEstimation(@AuthUser() user: User, @Body() startEstimationDto: StartEstimationDto) {
     return await this.storyService.startEstimation(startEstimationDto);
+  }
+
+  @Patch('reEstimate')
+  async reEstimate(@AuthUser() user: User, @Body() reEstimateDto: ReEstimateDto) {
+    return await this.storyService.reEstimate(reEstimateDto);
   }
 
   @Patch('revealEstimate')
